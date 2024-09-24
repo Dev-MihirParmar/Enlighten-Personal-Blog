@@ -89,9 +89,9 @@ interface Content {
 
 // Define the author constant
 const author: Author = {
-  name: 'John Doe',
-  avatar: '/placeholder.svg?height=200&width=200',
-  bio: 'Passionate web developer and designer with over 10 years of experience. Specializing in creating modern, responsive, and user-friendly websites.',
+  name: 'Mihir Parmar',
+  avatar: '/author.svg?height=200&width=200',
+  bio: 'A Passionate developer, Coder, Circuit Designer, Writer, Hobbyist, Electronics Enthusiast, Jee Aspirant or Whatever you like to call its.',
 };
 
 // Define the contents array outside the component for referential stability
@@ -329,11 +329,11 @@ export default function Component() {
     <>
       {/* Head for SEO and Meta Tags */}
       <Head>
-        <title>John Doe - Web Developer & Designer</title>
-        <meta name="description" content="John Doe's personal website showcasing articles, projects, videos, and more." />
-        <meta name="keywords" content="John Doe, Web Developer, Designer, JavaScript, React, Next.js, Projects" />
-        <meta property="og:title" content="John Doe - Web Developer & Designer" />
-        <meta property="og:description" content="Explore John Doe's articles, projects, and videos on web development and design." />
+        <title>Mihir Parmar - Web Developer & Designer</title>
+        <meta name="description" content="Mihir Parmar's personal website showcasing articles, projects, videos, and more." />
+        <meta name="keywords" content="Mihir Parmar, Web Developer, Designer, JavaScript, React, Next.js, Projects" />
+        <meta property="og:title" content="Mihir Parmar - Web Developer & Designer" />
+        <meta property="og:description" content="Explore Mihir Parmar's articles, projects, and videos on web development and design." />
         <meta property="og:image" content="/placeholder.svg?height=400&width=600" />
         <meta property="og:url" content="https://yourwebsite.com" />
         <meta name="twitter:card" content="summary_large_image" />
@@ -437,7 +437,7 @@ export default function Component() {
                     <Input
                       type="text"
                       name="search"
-                      placeholder="Search content..."
+                      placeholder="Search articles videos project repositories"
                       className={`pl-10 pr-4 py-2 w-full rounded-full bg-transparent ${darkMode ? 'text-white placeholder-gray-400' : 'text-gray-900 placeholder-gray-500'} focus:ring-2 focus:ring-blue-500`}
                       onFocus={() => setSearchFocused(true)}
                       onBlur={() => setSearchFocused(false)}
@@ -670,11 +670,11 @@ export default function Component() {
                 {/* Social Media Links */}
                 <div className="flex flex-wrap justify-center md:justify-start gap-4">
                   {[
-                    { icon: Facebook, label: 'Facebook', href: '#' },
-                    { icon: Twitter, label: 'Twitter', href: '#' },
-                    { icon: Instagram, label: 'Instagram', href: '#' },
-                    { icon: Linkedin, label: 'LinkedIn', href: '#' },
-                    { icon: Github, label: 'GitHub', href: '#' },
+                    { icon: Facebook, label: 'Facebook', href: 'https://mihirparmar.vercel.app/' },
+                    { icon: Twitter, label: 'Twitter', href: 'https://x.com/Dev_MihirParmar' },
+                    { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/dev.mihirparmar/' },
+                    { icon: Linkedin, label: 'LinkedIn', href: 'https://mihirparmar.vercel.app/' },
+                    { icon: Github, label: 'GitHub', href: 'https://github.com/Dev-MihirParmar' },
                   ].map((platform, index) => (
                     <a
                       key={index}
