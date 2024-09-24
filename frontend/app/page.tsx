@@ -1,7 +1,5 @@
-// ./app/page.tsx
 
 'use client'
-
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
