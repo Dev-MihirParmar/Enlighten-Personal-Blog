@@ -390,7 +390,7 @@ export default function Component() {
               <div className="w-1/3"></div>
               <Link href="/" className={`text-3xl font-bold text-center w-1/3 relative ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 {/* Animated Logo Letters */}
-                {['J', 'o', 'h', 'n', ' ', 'D', 'o', 'e'].map((char, index) => (
+                {['E', 'n', 'l', 'i', 'g', 'h', 't', 'e', 'n'].map((char, index) => (
                   <motion.span
                     key={index}
                     className="inline-block"
