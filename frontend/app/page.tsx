@@ -90,7 +90,7 @@ interface Content {
 // Define the author constant
 const author: Author = {
   name: 'Mihir Parmar',
-  avatar: '/author.svg?height=200&width=200',
+  avatar: '/author.svg?height=400&width=400',
   bio: 'A Passionate developer, Coder, Circuit Designer, Writer, Hobbyist, Electronics Enthusiast, Jee Aspirant or Whatever you like to call its.',
 };
 
@@ -437,7 +437,7 @@ export default function Component() {
                     <Input
                       type="text"
                       name="search"
-                      placeholder="Search articles videos project repositories"
+                      placeholder="Search Content ......"
                       className={`pl-10 pr-4 py-2 w-full rounded-full bg-transparent ${darkMode ? 'text-white placeholder-gray-400' : 'text-gray-900 placeholder-gray-500'} focus:ring-2 focus:ring-blue-500`}
                       onFocus={() => setSearchFocused(true)}
                       onBlur={() => setSearchFocused(false)}
