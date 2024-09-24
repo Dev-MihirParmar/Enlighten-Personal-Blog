@@ -80,7 +80,7 @@ interface Content {
   readTime: string;
   image: string;
   category: string;
-  type: 'article' | 'video' | 'project' | 'repository';
+  type: 'Article' | 'Video' | 'Project' | 'Repository';
   views: number;
   likes: number;
   bookmarks: number;
@@ -106,7 +106,7 @@ const contents: Content[] = [
     readTime: '5 min read',
     image: '/placeholder.svg?height=400&width=600',
     category: 'Technology',
-    type: 'article',
+    type: 'Article',
     views: 1200,
     likes: 45,
     bookmarks: 23,
@@ -121,7 +121,7 @@ const contents: Content[] = [
     readTime: '15 min watch',
     image: '/placeholder.svg?height=400&width=600',
     category: 'Mobile Development',
-    type: 'video',
+    type: 'Video',
     views: 3500,
     likes: 120,
     bookmarks: 67,
@@ -131,12 +131,12 @@ const contents: Content[] = [
     id: '3',
     title: 'Machine Learning Chatbot',
     excerpt:
-      'An open-source project for building intelligent chatbots using cutting-edge machine learning techniques, natural language processing, and adaptive learning algorithms.',
+      'An open-source Project for building intelligent chatbots using cutting-edge machine learning techniques, natural language processing, and adaptive learning algorithms.',
     date: '2023-09-05',
-    readTime: 'Ongoing project',
+    readTime: 'Ongoing Project',
     image: '/placeholder.svg?height=400&width=600',
     category: 'Artificial Intelligence',
-    type: 'project',
+    type: 'Project',
     views: 800,
     likes: 30,
     bookmarks: 15,
@@ -151,7 +151,7 @@ const contents: Content[] = [
     readTime: '1000+ stars',
     image: '/placeholder.svg?height=400&width=600',
     category: 'Open Source',
-    type: 'repository',
+    type: 'Repository',
     views: 5000,
     likes: 250,
     bookmarks: 180,
@@ -166,7 +166,7 @@ const contents: Content[] = [
     readTime: '8 min read',
     image: '/placeholder.svg?height=400&width=600',
     category: 'Web Design',
-    type: 'article',
+    type: 'Article',
     views: 2300,
     likes: 89,
     bookmarks: 42,
@@ -181,7 +181,7 @@ const contents: Content[] = [
     readTime: '12 min watch',
     image: '/placeholder.svg?height=400&width=600',
     category: 'API Development',
-    type: 'video',
+    type: 'Video',
     views: 1800,
     likes: 76,
     bookmarks: 38,
@@ -199,7 +199,7 @@ export default function Component() {
     }
     return true;
   });
-  const [activeTab, setActiveTab] = useState<'all' | 'article' | 'video' | 'project' | 'repository'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'Article' | 'Video' | 'Project' | 'Repository'>('all');
   const [featuredPostIndex, setFeaturedPostIndex] = useState<number>(0);
   const [scrolled, setScrolled] = useState<boolean>(false);
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
@@ -286,8 +286,8 @@ export default function Component() {
 
   // Type-Safe Tab Change Handler
   const handleTabChange = (value: string) => {
-    if (['all', 'article', 'video', 'project', 'repository'].includes(value)) {
-      setActiveTab(value as 'all' | 'article' | 'video' | 'project' | 'repository');
+    if (['all', 'Article', 'Video', 'Project', 'Repository'].includes(value)) {
+      setActiveTab(value as 'all' | 'Article' | 'Video' | 'Project' | 'Repository');
     }
   };
 
@@ -330,10 +330,10 @@ export default function Component() {
       {/* Head for SEO and Meta Tags */}
       <Head>
         <title>Mihir Parmar - Web Developer & Designer</title>
-        <meta name="description" content="Mihir Parmar's personal website showcasing articles, projects, videos, and more." />
+        <meta name="description" content="Mihir Parmar's personal website showcasing Articles, Projects, Videos, and more." />
         <meta name="keywords" content="Mihir Parmar, Web Developer, Designer, JavaScript, React, Next.js, Projects" />
         <meta property="og:title" content="Mihir Parmar - Web Developer & Designer" />
-        <meta property="og:description" content="Explore Mihir Parmar's articles, projects, and videos on web development and design." />
+        <meta property="og:description" content="Explore Mihir Parmar's Articles, Projects, and Videos on web development and design." />
         <meta property="og:image" content="/placeholder.svg?height=400&width=600" />
         <meta property="og:url" content="https://yourwebsite.com" />
         <meta name="twitter:card" content="summary_large_image" />
@@ -458,10 +458,10 @@ export default function Component() {
                   <TabsList className="w-full justify-center bg-transparent">
                     {[
                       { value: 'all', icon: Zap, label: 'All' },
-                      { value: 'article', icon: Book, label: 'Articles' },
-                      { value: 'video', icon: Video, label: 'Videos' },
-                      { value: 'project', icon: Code, label: 'Projects' },
-                      { value: 'repository', icon: Archive, label: 'Repositories' },
+                      { value: 'Article', icon: Book, label: 'Articles' },
+                      { value: 'Video', icon: Video, label: 'Videos' },
+                      { value: 'Project', icon: Code, label: 'Projects' },
+                      { value: 'Repository', icon: Archive, label: 'Repositories' },
                     ].map(({ value, icon: Icon, label }) => (
                       <TabsTrigger
                         key={value}
@@ -538,7 +538,7 @@ export default function Component() {
               <h2 id="newsletter" className="text-3xl font-bold mb-4 text-white">
                 Subscribe to My Newsletter
               </h2>
-              <p className="mb-6 text-white">Get the latest articles, videos, and news delivered straight to your inbox.</p>
+              <p className="mb-6 text-white">Get the latest Articles, Videos, and news delivered straight to your inbox.</p>
               <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4" aria-label="Subscribe to Newsletter">
                 <Input
                   type="email"
@@ -799,7 +799,7 @@ function FeaturedCard({ content, darkMode }: { content: Content; darkMode: boole
       <Link href={`/content/${content.id}`}>
         <Card
           className={`${darkMode ? 'bg-gray-800' : 'bg-white'} overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300 rounded-lg`}
-          role="article"
+          role="Article"
           aria-labelledby={`featured-${content.id}`}
         >
           <div className="md:flex">
@@ -872,7 +872,7 @@ function ContentCard({ content, index, darkMode }: { content: Content; index: nu
       <Link href={`/content/${content.id}`}>
         <Card
           className={`${darkMode ? 'bg-gray-800' : 'bg-white'} h-full flex flex-col cursor-pointer hover:shadow-lg transition-all duration-300 rounded-lg transform hover:scale-105`}
-          role="article"
+          role="Article"
           aria-labelledby={`content-${content.id}`}
         >
           <CardHeader className="p-4">
