@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, Eye, Heart, Bookmark, Share2, Search, Edit, Sun, Moon, Star, ArrowLeft, ArrowRight, Facebook, Twitter, Instagram, Linkedin, Github, Mail, Rss, Download } from 'lucide-react';
+import { Calendar, Clock, Eye, Heart, Bookmark, Share2, Search, Edit, Sun, Moon, Star, ArrowLeft, ArrowRight, Facebook, Twitter, Instagram, Linkedin, Github, Mail, Rss, Download, MessageSquare } from 'lucide-react';
 
 // This would typically come from a database or API
 const content = {
@@ -61,7 +61,9 @@ export default function UpdatedContentPage() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [claps, setClaps] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const relatedContentRef = useRef(null);
+  const [comments, setComments] = useState<string[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const relatedContentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
@@ -78,23 +80,39 @@ export default function UpdatedContentPage() {
 
   const handleClap = () => setClaps(claps + 1);
 
-  const scrollRelatedContent = (direction) => {
-    if (relatedContentRef.current) {
+  const scrollRelatedContent = (direction: 'left' | 'right') => {
+    if (relatedContentRef.current instanceof HTMLElement) {
       const scrollAmount = direction === 'left' ? -300 : 300;
       relatedContentRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
+  const handleArrowClick = (direction: 'left' | 'right') => {
+    if (direction === 'left') {
+      setCurrentSlide((prevSlide) => (prevSlide === 0 ? content.relatedContent.length - 1 : prevSlide - 1));
+    } else {
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % content.relatedContent.length);
+    }
+  };
+
+  const handleCommentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newComment.trim()) {
+      setComments([...comments, newComment as string]);
+      setNewComment("");
+    }
+  };
+
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-      <div className="bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <div className="bg-gray-900 text-gray-400 transition-colors duration-300">
         {/* Header */}
         <header className="sticky top-0 z-40 w-full backdrop-blur flex-none transition-colors duration-500 lg:z-50 lg:border-b lg:border-gray-900/10 dark:border-gray-50/[0.06] bg-white/75 dark:bg-gray-900/75">
-          <div className="container mx-auto px-6">
+          <div className="w-full px-8">
             <div className="py-4">
               <div className="relative flex items-center justify-between">
-                {/* Logo */}
-                <Link href="/" className="flex-none text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 ml-4">
+                {/* Logo - Moved to the left */}
+                <Link href="/" passHref className="flex-none text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
                   Enlighten
                 </Link>
                 {/* Search */}
@@ -110,7 +128,7 @@ export default function UpdatedContentPage() {
                   </div>
                 </div>
                 {/* Right side buttons */}
-                <div className="flex items-center space-x-4 mr-4">
+                <div className="flex items-center space-x-4">
                   <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
                     {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                   </Button>
@@ -176,17 +194,78 @@ export default function UpdatedContentPage() {
               <article className="prose prose-lg dark:prose-invert max-w-none mb-12" dangerouslySetInnerHTML={{ __html: content.content }} />
             </main>
 
-            {/* Related Content */}
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold mb-4">Related Content</h2>
-              <div className="relative overflow-hidden">
-                <div 
-                  ref={relatedContentRef} 
-                  className="flex transition-transform duration-500 ease-in-out space-x-4 pb-4"
+            {/* Action Bar */}
+            <section className="mb-8 flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <div className="flex items-center space-x-4">
+                <Button variant="ghost" size="sm" onClick={() => setIsLiked(!isLiked)}>
+                  <Heart className={`h-4 w-4 mr-2 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+                  {content.likes}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setIsBookmarked(!isBookmarked)}>
+                  <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+                  {content.bookmarks}
+                </Button>
+              </div>
+              <Button variant="ghost" size="sm">
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
+              </Button>
+            </section>
+
+            {/* Comment Box */}
+            <section className="mb-12 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <h3 className="text-xl font-bold mb-4">Leave a Comment</h3>
+              <form onSubmit={handleCommentSubmit} className="space-y-4">
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Write your comment here..."
+                  className="w-full p-2 border rounded-md"
+                />
+                <Button type="submit">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Post Comment
+                </Button>
+              </form>
+
+              {/* Display Comments */}
+              <div className="mt-8">
+                <h3 className="text-xl font-bold mb-4">Comments</h3>
+                {comments.length > 0 ? (
+                  <ul className="space-y-4">
+                    {comments.map((comment, index) => (
+                      <li key={index} className="p-4 bg-white dark:bg-gray-700 rounded-md">
+                        <p className="text-gray-900 dark:text-gray-100">{comment}</p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400">No comments yet. Be the first to comment!</p>
+                )}
+              </div>
+            </section>
+
+            {/* Related Content - Auto-sliding */}
+            <section className="mb-12 overflow-hidden">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">Related Content</h2>
+                <div className="flex items-center space-x-2">
+                  <Button variant="ghost" size="icon" onClick={() => handleArrowClick('left')}>
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleArrowClick('right')}>
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div
+                  ref={relatedContentRef}
+                  className="flex transition-transform duration-500 ease-in-out"
                   style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
                   {content.relatedContent.map((item) => (
-                    <Card key={item.id} className={`flex-shrink-0 w-80 p-4 shadow-md border ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-200 bg-white text-gray-900'} rounded-lg`}>
+                    <Card key={item.id} className={`flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-4 shadow-md border ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-200 bg-white text-gray-900'} rounded-lg mr-6`}>
                       <div className="relative">
                         <Image
                           src={item.image}
@@ -218,13 +297,32 @@ export default function UpdatedContentPage() {
                     </Card>
                   ))}
                 </div>
-                <button onClick={() => scrollRelatedContent('left')} className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white/75 dark:bg-gray-800/75 rounded-full p-2 shadow-md">
-                  <ArrowLeft className="h-6 w-6" />
-                </button>
-                <button onClick={() => scrollRelatedContent('right')} className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white/75 dark:bg-gray-800/75 rounded-full p-2 shadow-md">
-                  <ArrowRight className="h-6 w-6" />
-                </button>
               </div>
+              <div className="flex justify-center mt-4 space-x-2">
+                {content.relatedContent.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`w-3 h-3 rounded-full ${
+                      currentSlide === index ? 'bg-blue-500' : 'bg-gray-300'
+                    }`}
+                    onClick={() => setCurrentSlide(index)}
+                  />
+                ))}
+              </div>
+            </section>
+
+            {/* Get in Touch */}
+            <section className="mb-12 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <h2 className="text-3xl font-bold mb-4">Get in Touch</h2>
+              <p className="mb-6 text-gray-600 dark:text-gray-400">Feel free to reach out for collaborations or just a friendly chat.</p>
+              <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input placeholder="Your Name" className="bg-white dark:bg-gray-700" />
+                  <Input type="email" placeholder="Your Email" className="bg-white dark:bg-gray-700" />
+                </div>
+                <Textarea placeholder="Your Message" className="bg-white dark:bg-gray-700" rows={4} />
+                <Button type="submit" className="w-full">Send Message</Button>
+              </form>
             </section>
 
             {/* Newsletter Subscription */}
@@ -250,14 +348,14 @@ export default function UpdatedContentPage() {
           className={
             `${darkMode
               ? 'bg-gray-900 text-gray-400 border-gray-800'
-              : 'bg-gray-100 text-gray-600 border-gray-300'
+              : 'bg-gray-900 text-gray-400 border-gray-800'
             } border-t`
           }
           aria-labelledby="footer"
         >
           <div className="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-12">
-              {/* Author Avatar */}
+              {/* Author Avatar - Made circular */}
               <div className="flex-shrink-0">
                 <Image
                   src={content.author.avatar}
