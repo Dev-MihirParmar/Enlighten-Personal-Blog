@@ -15,7 +15,7 @@ const content = {
   id: '1',
   title: 'Mastering React with Video Tutorials',
   subheading: 'Learn React step-by-step through detailed video tutorials.',
-  videoUrl: 'https://www.example.com/video.mp4',
+  videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Updated to a YouTube video
   date: '2023-10-18',
   duration: '45 min',
   category: 'Web Development',
@@ -207,6 +207,10 @@ export default function VideoContentPage() {
                     {comments.map((comment, index) => (
                       <li key={index} className="p-4 bg-white dark:bg-gray-700 rounded-md">
                         <p className="text-gray-900 dark:text-gray-100">{comment}</p>
+                        <div className="mt-2 flex justify-end space-x-2">
+                          <Button variant="ghost" size="sm">Reply</Button>
+                          <Button variant="ghost" size="sm">Upvote</Button>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -255,8 +259,12 @@ export default function VideoContentPage() {
                         <div className="flex items-center text-sm">
                           <Calendar className="h-4 w-4 mr-1" />
                           <span className="mr-4">{item.date}</span>
-                          <Eye className="h-4 w-4 mr-1" />
-                          <span>{item.views}</span>
+                          {item.type === 'Video' ? (
+                            <PlayCircle className="h-4 w-4 mr-1" />
+                          ) : (
+                            <Eye className="h-4 w-4 mr-1" />
+                          )}
+                          <span>{item.views || item.likes}</span>
                         </div>
                       </CardContent>
                     </Card>
