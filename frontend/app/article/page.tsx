@@ -59,7 +59,7 @@ export default function UpdatedContentPage() {
   const [darkMode, setDarkMode] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [claps, setClaps] = useState(0);
+  const [] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [comments, setComments] = useState<string[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -78,14 +78,7 @@ export default function UpdatedContentPage() {
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
-  const handleClap = () => setClaps(claps + 1);
 
-  const scrollRelatedContent = (direction: 'left' | 'right') => {
-    if (relatedContentRef.current instanceof HTMLElement) {
-      const scrollAmount = direction === 'left' ? -300 : 300;
-      relatedContentRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
 
   const handleArrowClick = (direction: 'left' | 'right') => {
     if (direction === 'left') {
@@ -112,9 +105,7 @@ export default function UpdatedContentPage() {
             <div className="py-4">
               <div className="relative flex items-center justify-between">
                 {/* Logo - Moved to the left */}
-                <Link href="/" passHref className="flex-none text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
-                  Enlighten
-                </Link>
+                <Link href="/" passHref className="flex-none text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">Enlighten</Link>
                 {/* Search */}
                 <div className="flex-grow mx-4">
                   <div className="relative w-full">
@@ -441,3 +432,4 @@ export default function UpdatedContentPage() {
     </div>
   );
 }
+
