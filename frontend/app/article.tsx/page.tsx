@@ -56,12 +56,12 @@ const content = {
 };
 
 export default function UpdatedContentPage() {
-  const [darkMode, setDarkMode] = useState<boolean>(true);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
-  const [claps, setClaps] = useState<number>(0);
-  const [currentSlide, setCurrentSlide] = useState<number>(0);
-  const relatedContentRef = useRef<HTMLDivElement | null>(null);
+  const [darkMode, setDarkMode] = useState(true);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [claps, setClaps] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const relatedContentRef = useRef(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
@@ -78,7 +78,7 @@ export default function UpdatedContentPage() {
 
   const handleClap = () => setClaps(claps + 1);
 
-  const scrollRelatedContent = (direction: 'left' | 'right'): void => {
+  const scrollRelatedContent = (direction) => {
     if (relatedContentRef.current) {
       const scrollAmount = direction === 'left' ? -300 : 300;
       relatedContentRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
