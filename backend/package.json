@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "cors": "^2.8.5",
     "mongoose": "^5.12.3",
     "next": "latest",
     "react": "latest",
