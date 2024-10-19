@@ -9,32 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Clock, Eye, Heart, Bookmark, Share2, Search, Edit, Sun, Moon, Star, ArrowLeft, ArrowRight, Facebook, Twitter, Instagram, Linkedin, Github, Mail, Rss, Download, MessageSquare, PlayCircle } from 'lucide-react';
-
-// This would typically come from a database or API
-const content = {
-  id: '1',
-  title: 'Mastering React with Video Tutorials',
-  subheading: 'Learn React step-by-step through detailed video tutorials.',
-  videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Updated to a YouTube video
-  date: '2023-10-18',
-  duration: '45 min',
-  category: 'Web Development',
-  type: 'Video',
-  views: 2500,
-  likes: 150,
-  bookmarks: 60,
-  comments: 15,
-  author: {
-    name: 'Mihir Parmar',
-    avatar: '/author.svg?height=400&width=400',
-  },
-  relatedContent: [
-    { id: '2', title: 'Advanced React Patterns', type: 'Video', image: '/placeholder.svg?height=400&width=600', description: 'Explore advanced design patterns and best practices in React development.', date: '9/1/2023', duration: '30 min', views: 4000 },
-    { id: '3', title: 'Building a Next.js App', type: 'Article', image: '/placeholder.svg?height=400&width=600', description: 'Step-by-step guide on building a web application using Next.js.', date: '8/15/2023', readTime: '15 min', likes: 300 },
-    { id: '4', title: 'JavaScript Deep Dive', type: 'Video', image: '/placeholder.svg?height=400&width=600', description: 'Detailed exploration of JavaScript concepts for intermediate developers.', date: '7/22/2023', duration: '40 min', views: 3500 },
-    { id: '5', title: 'Node.js for Beginners', type: 'Video', image: '/placeholder.svg?height=400&width=600', description: 'Introduction to server-side programming using Node.js.', date: '6/30/2023', duration: '50 min', views: 2000 },
-  ]
-};
+import axios from 'axios';
+import ReactPlayer from 'react-player';
 
 export default function VideoContentPage() {
   const [darkMode, setDarkMode] = useState(true);
@@ -43,6 +19,7 @@ export default function VideoContentPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [comments, setComments] = useState<string[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [videoData, setVideoData] = useState<any>(null);
   const relatedContentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -51,18 +28,31 @@ export default function VideoContentPage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % content.relatedContent.length);
+      if (videoData && videoData.relatedContent) {
+        setCurrentSlide((prevSlide) => (prevSlide + 1) % videoData.relatedContent.length);
+      }
     }, 5000);
     return () => clearInterval(interval);
+  }, [videoData]);
+
+  useEffect(() => {
+    // Fetch video data from backend
+    axios.get('/api/videos/1')
+      .then(response => {
+        setVideoData(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching video data:', error);
+      });
   }, []);
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
 
   const handleArrowClick = (direction: 'left' | 'right') => {
     if (direction === 'left') {
-      setCurrentSlide((prevSlide) => (prevSlide === 0 ? content.relatedContent.length - 1 : prevSlide - 1));
+      setCurrentSlide((prevSlide) => (prevSlide === 0 ? videoData.relatedContent.length - 1 : prevSlide - 1));
     } else {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % content.relatedContent.length);
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % videoData.relatedContent.length);
     }
   };
 
@@ -73,6 +63,10 @@ export default function VideoContentPage() {
       setNewComment("");
     }
   };
+
+  if (!videoData) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
@@ -116,32 +110,32 @@ export default function VideoContentPage() {
           <div className="max-w-4xl mx-auto">
             {/* Content Header */}
             <header className="mb-8">
-              <h1 className="text-4xl font-bold mb-2">{content.title}</h1>
-              <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">{content.subheading}</p>
+              <h1 className="text-4xl font-bold mb-2">{videoData.title}</h1>
+              <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">{videoData.subheading}</p>
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center">
                   <Avatar className="h-10 w-10 mr-3">
-                    <AvatarImage src={content.author.avatar} alt={content.author.name} />
-                    <AvatarFallback>{content.author.name[0]}</AvatarFallback>
+                    <AvatarImage src={videoData.author.avatar} alt={videoData.author.name} />
+                    <AvatarFallback>{videoData.author.name[0]}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold">{content.author.name}</p>
+                    <p className="font-semibold">{videoData.author.name}</p>
                     <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
                       <Calendar className="h-4 w-4 mr-1" />
-                      <span className="mr-3">{content.date}</span>
+                      <span className="mr-3">{videoData.date}</span>
                       <Clock className="h-4 w-4 mr-1" />
-                      <span>{content.duration}</span>
+                      <span>{videoData.duration}</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
                   <Button variant="ghost" size="sm" onClick={() => setIsLiked(!isLiked)}>
                     <Heart className={`h-4 w-4 mr-2 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-                    {content.likes}
+                    {videoData.likes}
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => setIsBookmarked(!isBookmarked)}>
                     <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-yellow-500 text-yellow-500' : ''}`} />
-                    {content.bookmarks}
+                    {videoData.bookmarks}
                   </Button>
                   <Button variant="ghost" size="sm">
                     <Share2 className="h-4 w-4 mr-2" />
@@ -154,14 +148,14 @@ export default function VideoContentPage() {
             {/* Video Player */}
             <main className="mb-12">
               <div className="relative w-full h-0" style={{ paddingBottom: '56.25%' }}>
-                <iframe
+                <ReactPlayer
                   className="absolute top-0 left-0 w-full h-full rounded-lg"
-                  src={content.videoUrl}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  title={content.title}
-                ></iframe>
+                  url={videoData.videoUrl}
+                  controls
+                  playing
+                  width="100%"
+                  height="100%"
+                />
               </div>
             </main>
 
@@ -170,11 +164,11 @@ export default function VideoContentPage() {
               <div className="flex items-center space-x-4">
                 <Button variant="ghost" size="sm" onClick={() => setIsLiked(!isLiked)}>
                   <Heart className={`h-4 w-4 mr-2 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-                  {content.likes}
+                  {videoData.likes}
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => setIsBookmarked(!isBookmarked)}>
                   <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-yellow-500 text-yellow-500' : ''}`} />
-                  {content.bookmarks}
+                  {videoData.bookmarks}
                 </Button>
               </div>
               <Button variant="ghost" size="sm">
@@ -239,7 +233,7 @@ export default function VideoContentPage() {
                   className="flex transition-transform duration-500 ease-in-out"
                   style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
-                  {content.relatedContent.map((item) => (
+                  {videoData.relatedContent.map((item: any) => (
                     <Card key={item.id} className={`flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-4 shadow-md border ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-200 bg-white text-gray-900'} rounded-lg mr-6`}>
                       <div className="relative">
                         <Image
@@ -272,7 +266,7 @@ export default function VideoContentPage() {
                 </div>
               </div>
               <div className="flex justify-center mt-4 space-x-2">
-                {content.relatedContent.map((_, index) => (
+                {videoData.relatedContent.map((_: any, index: number) => (
                   <button
                     key={index}
                     className={`w-3 h-3 rounded-full ${
@@ -331,8 +325,8 @@ export default function VideoContentPage() {
               {/* Author Avatar - Made circular */}
               <div className="flex-shrink-0">
                 <Image
-                  src={content.author.avatar}
-                  alt={content.author.name}
+                  src={videoData.author.avatar}
+                  alt={videoData.author.name}
                   width={200}
                   height={200}
                   className="rounded-full shadow-lg"
@@ -341,7 +335,7 @@ export default function VideoContentPage() {
               </div>
               {/* Author Info */}
               <div className="flex-grow text-center md:text-left">
-                <h2 className={`text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{content.author.name}</h2>
+                <h2 className={`text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{videoData.author.name}</h2>
                 <p className="text-lg mb-6 max-w-2xl">A Passionate developer, Coder, Circuit Designer, Writer, Hobbyist, Electronics Enthusiast, Jee Aspirant or Whatever you like to call its.</p>
                 {/* Social Media Links */}
                 <div className="flex flex-wrap justify-center md:justify-start gap-4">
@@ -406,7 +400,7 @@ export default function VideoContentPage() {
 
             {/* Copyright */}
             <div className={`mt-8 text-center text-sm ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-              &copy; {new Date().getFullYear()} {content.author.name}. All rights reserved.
+              &copy; {new Date().getFullYear()} {videoData.author.name}. All rights reserved.
             </div>
           </div>
         </footer>
