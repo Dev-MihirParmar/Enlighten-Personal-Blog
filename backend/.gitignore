@@ -1,0 +1,22 @@
+.env.local
+# .gitignore
+
+# Node.js dependencies
+node_modules/
+
+# Local environment variables
+.env
+.env.local
+
+# Next.js build output
+.next/
+
+# Logs
+logs
+*.log
+
+# System files
+.DS_Store
+
+# Optional: exclude your database data if you have any
+data/
