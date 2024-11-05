@@ -1,84 +1,111 @@
-"use client";
+'use client'
 
-import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, Eye, Heart, Bookmark, Share2, Search, Edit, Sun, Moon, Star, ArrowLeft, ArrowRight, Facebook, Twitter, Instagram, Linkedin, Github, Mail, Rss, Download, MessageSquare, PlayCircle } from 'lucide-react';
-import axios from 'axios';
-import ReactPlayer from 'react-player';
+import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Calendar, Clock, Eye, Heart, Bookmark, Share2, Search, Edit, Sun, Moon, Star, ArrowLeft, ArrowRight, Facebook, Twitter, Instagram, Linkedin, Github, Mail, Rss, Download, MessageSquare, PlayCircle } from 'lucide-react'
+
+// Dummy data
+const dummyVideoData = {
+  id: 1,
+  title: "Understanding React Hooks",
+  subheading: "A deep dive into the world of functional components",
+  description: "This video provides a comprehensive overview of React Hooks, explaining their purpose, usage, and best practices.  We'll cover useState, useEffect, useContext, and more!",
+  author: {
+    name: "Mihir Parmar",
+    avatar: "/author.svg?height=400&width=400"
+  },
+  date: "May 15, 2023",
+  duration: "15:30",
+  likes: 1234,
+  bookmarks: 567,
+  videoUrl: "https://your-backend-url.com/api/videos/react-hooks-tutorial.mp4",
+  relatedContent: [
+    {
+      id: 1,
+      title: "React State Management",
+      description: "Learn about different state management techniques in React",
+      image: "/placeholder.svg?height=400&width=600",
+      type: "Video",
+      date: "June 1, 2023",
+      views: 5000
+    },
+    {
+      id: 2,
+      title: "Building Scalable React Apps",
+      description: "Best practices for creating large-scale React applications",
+      image: "/placeholder.svg?height=400&width=600",
+      type: "Article",
+      date: "May 20, 2023",
+      likes: 3000
+    },
+    {
+      id: 3,
+      title: "React Performance Optimization",
+      description: "Tips and tricks to boost your React app's performance",
+      image: "/placeholder.svg?height=400&width=600",
+      type: "Video",
+      date: "June 10, 2023",
+      views: 4500
+    }
+  ]
+}
 
 export default function VideoContentPage() {
-  const [darkMode, setDarkMode] = useState(true);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [comments, setComments] = useState<string[]>([]);
-  const [newComment, setNewComment] = useState("");
-  const [videoData, setVideoData] = useState<any>(null);
-  const relatedContentRef = useRef<HTMLDivElement | null>(null);
+  const [darkMode, setDarkMode] = useState(true)
+  const [isLiked, setIsLiked] = useState(false)
+  const [isBookmarked, setIsBookmarked] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [comments, setComments] = useState<string[]>([])
+  const [newComment, setNewComment] = useState("")
+  const [videoData, setVideoData] = useState(dummyVideoData)
+  const relatedContentRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode);
-  }, [darkMode]);
+    document.documentElement.classList.toggle('dark', darkMode)
+  }, [darkMode])
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (videoData && videoData.relatedContent) {
-        setCurrentSlide((prevSlide) => (prevSlide + 1) % videoData.relatedContent.length);
+        setCurrentSlide((prevSlide) => (prevSlide + 1) % videoData.relatedContent.length)
       }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [videoData]);
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [videoData])
 
-  useEffect(() => {
-    // Fetch video data from backend
-    axios.get('/api/videos/1')
-      .then(response => {
-        setVideoData(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching video data:', error);
-      });
-  }, []);
-
-  const toggleDarkMode = () => setDarkMode(!darkMode);
+  const toggleDarkMode = () => setDarkMode(!darkMode)
 
   const handleArrowClick = (direction: 'left' | 'right') => {
     if (direction === 'left') {
-      setCurrentSlide((prevSlide) => (prevSlide === 0 ? videoData.relatedContent.length - 1 : prevSlide - 1));
+      setCurrentSlide((prevSlide) => (prevSlide === 0 ? videoData.relatedContent.length - 1 : prevSlide - 1))
     } else {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % videoData.relatedContent.length);
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % videoData.relatedContent.length)
     }
-  };
+  }
 
   const handleCommentSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (newComment.trim()) {
-      setComments([...comments, newComment as string]);
-      setNewComment("");
+      setComments([...comments, newComment])
+      setNewComment("")
     }
-  };
-
-  if (!videoData) {
-    return <div>Loading...</div>;
   }
 
   return (
     <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-      <div className="bg-gray-900 text-gray-400 transition-colors duration-300">
+      <div className={`${darkMode ? 'bg-gray-900 text-gray-400' : 'bg-white text-gray-900'} transition-colors duration-300`}>
         {/* Header */}
         <header className="sticky top-0 z-40 w-full backdrop-blur flex-none transition-colors duration-500 lg:z-50 lg:border-b lg:border-gray-900/10 dark:border-gray-50/[0.06] bg-white/75 dark:bg-gray-900/75">
           <div className="w-full px-8">
             <div className="py-4">
               <div className="relative flex items-center justify-between">
-                {/* Logo - Moved to the left */}
-                <Link href="/" passHref className="flex-none text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">Enlighten</Link>
-                {/* Search */}
+                <Link href="/" className="flex-none text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">Enlighten</Link>
                 <div className="flex-grow mx-4">
                   <div className="relative w-full">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={20} />
@@ -90,7 +117,6 @@ export default function VideoContentPage() {
                     />
                   </div>
                 </div>
-                {/* Right side buttons */}
                 <div className="flex items-center space-x-4">
                   <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
                     {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -107,7 +133,7 @@ export default function VideoContentPage() {
 
         {/* Main Content */}
         <div className="container mx-auto px-6 py-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             {/* Content Header */}
             <header className="mb-8">
               <h1 className="text-4xl font-bold mb-2">{videoData.title}</h1>
@@ -148,16 +174,21 @@ export default function VideoContentPage() {
             {/* Video Player */}
             <main className="mb-12">
               <div className="relative w-full h-0" style={{ paddingBottom: '56.25%' }}>
-                <ReactPlayer
+                <video
                   className="absolute top-0 left-0 w-full h-full rounded-lg"
-                  url={videoData.videoUrl}
+                  src={videoData.videoUrl}
                   controls
-                  playing
                   width="100%"
                   height="100%"
                 />
               </div>
             </main>
+
+            {/* Video Description */}
+            <section className="mb-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <h3 className="text-xl font-bold mb-2">Description</h3>
+              <p className="text-gray-700 dark:text-gray-300">{videoData.description}</p>
+            </section>
 
             {/* Action Bar */}
             <section className="mb-8 flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
@@ -233,7 +264,7 @@ export default function VideoContentPage() {
                   className="flex transition-transform duration-500 ease-in-out"
                   style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
-                  {videoData.relatedContent.map((item: any) => (
+                  {videoData.relatedContent.map((item) => (
                     <Card key={item.id} className={`flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-4 shadow-md border ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-200 bg-white text-gray-900'} rounded-lg mr-6`}>
                       <div className="relative">
                         <Image
@@ -265,8 +296,8 @@ export default function VideoContentPage() {
                   ))}
                 </div>
               </div>
-              <div className="flex justify-center mt-4 space-x-2">
-                {videoData.relatedContent.map((_: any, index: number) => (
+              <div  className="flex justify-center mt-4 space-x-2">
+                {videoData.relatedContent.map((_, index) => (
                   <button
                     key={index}
                     className={`w-3 h-3 rounded-full ${
@@ -311,18 +342,10 @@ export default function VideoContentPage() {
         </div>
 
         {/* Footer */}
-        <footer
-          className={
-            `${darkMode
-              ? 'bg-gray-900 text-gray-400 border-gray-800'
-              : 'bg-gray-900 text-gray-400 border-gray-800'
-            } border-t`
-          }
-          aria-labelledby="footer"
-        >
+        <footer className={`${darkMode ? 'bg-gray-900 text-gray-400 border-gray-800' : 'bg-gray-900 text-gray-400 border-gray-800'} border-t`}>
           <div className="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-12">
-              {/* Author Avatar - Made circular */}
+              {/* Author Avatar */}
               <div className="flex-shrink-0">
                 <Image
                   src={videoData.author.avatar}
@@ -330,16 +353,16 @@ export default function VideoContentPage() {
                   width={200}
                   height={200}
                   className="rounded-full shadow-lg"
-                  loading="lazy"
                 />
               </div>
               {/* Author Info */}
               <div className="flex-grow text-center md:text-left">
                 <h2 className={`text-3xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{videoData.author.name}</h2>
-                <p className="text-lg mb-6 max-w-2xl">A Passionate developer, Coder, Circuit Designer, Writer, Hobbyist, Electronics Enthusiast, Jee Aspirant or Whatever you like to call its.</p>
+                <p className="text-lg mb-6 max-w-2xl">A passionate developer, coder, and tech enthusiast sharing knowledge and insights about web development and beyond.</p>
                 {/* Social Media Links */}
                 <div className="flex flex-wrap justify-center md:justify-start gap-4">
-                  {[{ icon: Facebook, label: 'Facebook', href: 'https://mihirparmar.vercel.app/' },
+                  {[
+                    { icon: Facebook, label: 'Facebook', href: 'https://mihirparmar.vercel.app/' },
                     { icon: Twitter, label: 'Twitter', href: 'https://x.com/Dev_MihirParmar' },
                     { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/dev.mihirparmar/' },
                     { icon: Linkedin, label: 'LinkedIn', href: 'https://mihirparmar.vercel.app/' },
@@ -390,7 +413,7 @@ export default function VideoContentPage() {
                 >
                   <Rss className="h-5 w-5" />
                 </a>
-                {/* Resume Download Dialog */}
+                {/* Resume Download Button */}
                 <Button variant="outline" size="sm" className="rounded-full">
                   <Download className="h-4 w-4 mr-2" />
                   Resume
@@ -406,5 +429,6 @@ export default function VideoContentPage() {
         </footer>
       </div>
     </div>
-  );
+  )
 }
+
