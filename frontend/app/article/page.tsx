@@ -56,7 +56,14 @@ const content = {
 };
 
 export default function UpdatedContentPage() {
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    // Retrieve dark mode preference from localStorage if available
+    if (typeof window !== 'undefined') {
+      const storedMode = localStorage.getItem('darkMode');
+      return storedMode ? JSON.parse(storedMode) : true;
+    }
+    return true;
+  });
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [] = useState(0);
@@ -66,7 +73,15 @@ export default function UpdatedContentPage() {
   const relatedContentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode);
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    // Save preference to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    }
   }, [darkMode]);
 
   useEffect(() => {
@@ -77,8 +92,6 @@ export default function UpdatedContentPage() {
   }, []);
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
-
-
 
   const handleArrowClick = (direction: 'left' | 'right') => {
     if (direction === 'left') {
@@ -97,8 +110,8 @@ export default function UpdatedContentPage() {
   };
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-      <div className="bg-gray-900 text-gray-400 transition-colors duration-300">
+    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
+      <div>
         {/* Header */}
         <header className="sticky top-0 z-40 w-full backdrop-blur flex-none transition-colors duration-500 lg:z-50 lg:border-b lg:border-gray-900/10 dark:border-gray-50/[0.06] bg-white/75 dark:bg-gray-900/75">
           <div className="w-full px-8">
@@ -135,7 +148,7 @@ export default function UpdatedContentPage() {
 
         {/* Main Content */}
         <div className="container mx-auto px-6 py-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             {/* Content Header */}
             <header className="mb-8">
               <h1 className="text-4xl font-bold mb-2">{content.title}</h1>
@@ -339,7 +352,7 @@ export default function UpdatedContentPage() {
           className={
             `${darkMode
               ? 'bg-gray-900 text-gray-400 border-gray-800'
-              : 'bg-gray-900 text-gray-400 border-gray-800'
+              : 'bg-gray-100 text-gray-600 border-gray-300'
             } border-t`
           }
           aria-labelledby="footer"
@@ -432,4 +445,3 @@ export default function UpdatedContentPage() {
     </div>
   );
 }
-
