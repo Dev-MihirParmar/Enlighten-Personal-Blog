@@ -77,7 +77,7 @@ const Meditor: React.FC<MeditorProps> = ({ content, setContent }) => {
         },
       }),
       Underline,
-      Link,
+      Link.configure({ openOnClick: false }),
       Blockquote,
       Image,
       Placeholder.configure({
@@ -105,11 +105,7 @@ const Meditor: React.FC<MeditorProps> = ({ content, setContent }) => {
         class: "before:prose-p:content-none after:prose-p:content-none prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-xl focus:outline-none prose-img:mx-auto prose-img:m-0 prose-img:mt-[43px]",
       },
     },
-    content: `
-      <h1>Welcome to Meditor</h1>
-      <p>Click on the plus button on a new line to see the floating menu</p>
-      <p>Select the content to see the bubble menu</p>
-      `,
+    
   });
   
   const ref = useRef<HTMLDivElement>(null);
@@ -132,8 +128,8 @@ const Meditor: React.FC<MeditorProps> = ({ content, setContent }) => {
     <>
       <EditorBubbleMenu 
         editor={editor} 
-        showBubbleMenu={showBubbleMenu || false} 
-        showLinkSelector={showLinkSelector || false} 
+        showBubbleMenu={showBubbleMenu} 
+        showLinkSelector={showLinkSelector} 
         setShowLinkSelector={setShowLinkSelector} 
       />
       <EditorFloatingMenu
