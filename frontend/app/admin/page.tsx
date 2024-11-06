@@ -158,11 +158,11 @@ export default function AdminDashboard() {
               <CardDescription>Select a content type to create</CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
-              <Button onClick={() => navigateToEditor('Article')} className="h-20 text-lg">
+              <Button onClick={() => navigateToEditor('Articles')} className="h-20 text-lg">
                 <PlusCircle className="mr-2 h-5 w-5" />
                 New Article
               </Button>
-              <Button onClick={() => navigateToEditor('Video')} className="h-20 text-lg">
+              <Button onClick={() => navigateToEditor('Videos')} className="h-20 text-lg">
                 <PlusCircle className="mr-2 h-5 w-5" />
                 New Video
               </Button>
