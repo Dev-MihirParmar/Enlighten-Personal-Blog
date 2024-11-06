@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
@@ -12,40 +12,6 @@ import Meditor from "@/components/Meditor"
 import { Calendar, Clock, Search, Sun, Moon, Upload, Save, Trash, ArrowLeft } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-
-// Dummy data for an existing article
-const existingArticleData = {
-  id: '1',
-  title: 'The Future of Web Development: Exploring Next.js and React Server Components',
-  subheading: 'Dive into the cutting-edge features of Next.js and how React Server Components are revolutionizing web development.',
-  content: `
-    <p>Next.js has been at the forefront of React-based web development for years, and with the introduction of React Server Components, it's taking another leap forward. In this article, we'll explore how these technologies are shaping the future of web development.</p>
-    
-    <h2>What are React Server Components?</h2>
-    <p>React Server Components allow developers to render components on the server, reducing the amount of JavaScript sent to the client and improving performance. This is particularly beneficial for content-heavy applications.</p>
-    
-    <h2>Key Benefits of Next.js and React Server Components</h2>
-    <ul>
-      <li>Improved Performance: Faster initial page loads and reduced Time to Interactive (TTI).</li>
-      <li>Better SEO: Server-rendered content is more easily indexable by search engines.</li>
-      <li>Enhanced Developer Experience: Simplified data fetching and state management.</li>
-    </ul>
-    
-    <h2>Getting Started with React Server Components in Next.js</h2>
-    <p>To start using React Server Components in your Next.js project, you'll need to...</p>
-    
-    <h2>Conclusion</h2>
-    <p>As web development continues to evolve, technologies like Next.js and React Server Components are paving the way for faster, more efficient, and more developer-friendly applications. By embracing these tools, we can create better experiences for both users and developers alike.</p>
-  `,
-  date: '2023-10-18',
-  readTime: '10 min read',
-  image: '/placeholder.svg?height=400&width=800',
-  category: 'Web Development',
-  author: {
-    name: 'Mihir Parmar',
-    avatar: '/author.svg?height=400&width=400',
-  },
-}
 
 // Empty data for a new article
 const newArticleData = {
@@ -63,16 +29,16 @@ const newArticleData = {
   },
 }
 
-export default function ArticleEditorPage({ isNewArticle = false }) {
+export default function ArticleEditorPage({ articleId = null }) {
   const [darkMode, setDarkMode] = useState(true)
-  const [articleData, setArticleData] = useState(isNewArticle ? newArticleData : existingArticleData)
-  const [title, setTitle] = useState(articleData.title)
-  const [subheading, setSubheading] = useState(articleData.subheading)
-  const [content, setContent] = useState(articleData.content)
-  const [date, setDate] = useState(articleData.date)
-  const [readTime, setReadTime] = useState(articleData.readTime)
-  const [category, setCategory] = useState(articleData.category)
-  const [image, setImage] = useState(articleData.image)
+  const [articleData, setArticleData] = useState(newArticleData)
+  const [title, setTitle] = useState('')
+  const [subheading, setSubheading] = useState('')
+  const [content, setContent] = useState('')
+  const [date, setDate] = useState('')
+  const [readTime, setReadTime] = useState('')
+  const [category, setCategory] = useState('')
+  const [image, setImage] = useState('')
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -80,10 +46,43 @@ export default function ArticleEditorPage({ isNewArticle = false }) {
     document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
 
+  useEffect(() => {
+    if (articleId) {
+      // Fetch existing article data
+      fetchArticle(articleId)
+    }
+  }, [articleId])
+
+  const fetchArticle = async (id) => {
+    setIsLoading(true)
+    try {
+      // Replace this with your actual API call
+      const response = await fetch(`/api/articles/${id}`)
+      const data = await response.json()
+      setArticleData(data)
+      setTitle(data.title)
+      setSubheading(data.subheading)
+      setContent(data.content)
+      setDate(data.date)
+      setReadTime(data.readTime)
+      setCategory(data.category)
+      setImage(data.image)
+    } catch (error) {
+      toast.error('Failed to fetch article')
+    }
+    setIsLoading(false)
+  }
+
   const toggleDarkMode = () => setDarkMode(!darkMode)
 
   const handleAutoSave = () => {
-    setArticleData({
+    // Implement auto-save logic here
+    toast.info('Auto-saving changes...', { autoClose: 1000 })
+  }
+
+  const handleSaveChanges = async () => {
+    setIsLoading(true)
+    const updatedArticle = {
       ...articleData,
       title,
       subheading,
@@ -92,31 +91,31 @@ export default function ArticleEditorPage({ isNewArticle = false }) {
       readTime,
       category,
       image,
-    })
-    toast.info('Auto-saving changes...', { autoClose: 1000 })
-  }
+    }
 
-  const handleSaveChanges = () => {
-    setIsLoading(true)
-    setTimeout(() => {
-      setArticleData({
-        ...articleData,
-        title,
-        subheading,
-        content,
-        date,
-        readTime,
-        category,
-        image,
+    try {
+      // Replace this with your actual API call
+      const response = await fetch(`/api/articles${articleId ? `/${articleId}` : ''}`, {
+        method: articleId ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedArticle),
       })
-      setIsLoading(false)
-      toast.success(isNewArticle ? 'New article created successfully!' : 'Changes saved successfully!')
-    }, 2000)
-    // Here you would make an API call to save the changes to the backend
+
+      if (response.ok) {
+        setArticleData(updatedArticle)
+        toast.success(articleId ? 'Changes saved successfully!' : 'New article created successfully!')
+      } else {
+        throw new Error('Failed to save article')
+      }
+    } catch (error) {
+      toast.error('Failed to save article')
+    }
+
+    setIsLoading(false)
   }
 
-  const handleDeleteArticle = () => {
-    if (isNewArticle) {
+  const handleDeleteArticle = async () => {
+    if (!articleId) {
       // Reset form for new article
       setTitle('')
       setSubheading('')
@@ -128,8 +127,21 @@ export default function ArticleEditorPage({ isNewArticle = false }) {
       toast.info("Form reset")
     } else {
       // Delete existing article
-      toast.error("Article deleted")
-      // Here you would make an API call to delete the article from the backend
+      try {
+        // Replace this with your actual API call
+        const response = await fetch(`/api/articles/${articleId}`, {
+          method: 'DELETE',
+        })
+
+        if (response.ok) {
+          toast.success("Article deleted")
+          // Redirect to articles list or home page
+        } else {
+          throw new Error('Failed to delete article')
+        }
+      } catch (error) {
+        toast.error('Failed to delete article')
+      }
     }
   }
 
@@ -225,7 +237,7 @@ export default function ArticleEditorPage({ isNewArticle = false }) {
               // Edit Mode
               <div>
                 <header className="mb-8">
-                  <h1 className="text-4xl font-bold mb-2">{isNewArticle ? 'Create New Article' : 'Edit Article'}</h1>
+                  <h1 className="text-4xl font-bold mb-2">{articleId ? 'Edit Article' : 'Create New Article'}</h1>
                 </header>
 
                 <section className="mb-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
@@ -292,11 +304,11 @@ export default function ArticleEditorPage({ isNewArticle = false }) {
 
                 <section className="mb-8 flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
                   <Button variant="default" size="sm" onClick={handleSaveChanges} className="ml-auto" disabled={isLoading}>
-                    {isLoading ? 'Saving...' : <><Save className="h-4 w-4 mr-2" /> {isNewArticle ? 'Create Article' : 'Save Changes'}</>}
+                    {isLoading ? 'Saving...' : <><Save className="h-4 w-4 mr-2" /> {articleId ? 'Save Changes' : 'Create Article'}</>}
                   </Button>
                   <Button variant="outline" size="sm" onClick={handleDeleteArticle}>
                     <Trash className="h-4 w-4 mr-2" />
-                    {isNewArticle ? 'Reset Form' : 'Delete Article'}
+                    {articleId ? 'Delete Article' : 'Reset Form'}
                   </Button>
                 </section>
               </div>

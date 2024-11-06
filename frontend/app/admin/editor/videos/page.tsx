@@ -11,73 +11,24 @@ import { Calendar, Clock, Search, Sun, Moon, Upload, Save, Trash, Mail, Rss, Dow
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-// Dummy data for an existing video
-const existingVideoData = {
-  id: 1,
-  title: "Understanding React Hooks",
-  subheading: "A deep dive into the world of functional components",
-  description: "This video provides a comprehensive overview of React Hooks, explaining their purpose, usage, and best practices. We'll cover useState, useEffect, useContext, and more!",
-  author: {
-    name: "Mihir Parmar",
-    avatar: "/author.svg?height=400&width=400"
-  },
-  date: "May 15, 2023",
-  duration: "15:30",
-  likes: 1234,
-  bookmarks: 567,
-  videoUrl: "https://your-backend-url.com/api/videos/react-hooks-tutorial.mp4",
-  relatedContent: [
-    {
-      id: 1,
-      title: "React State Management",
-      description: "Learn about different state management techniques in React",
-      image: "/placeholder.svg?height=400&width=600",
-      type: "Video",
-      date: "June 1, 2023",
-      views: 5000
-    },
-    {
-      id: 2,
-      title: "Building Scalable React Apps",
-      description: "Best practices for creating large-scale React applications",
-      image: "/placeholder.svg?height=400&width=600",
-      type: "Article",
-      date: "May 20, 2023",
-      likes: 3000
-    },
-    {
-      id: 3,
-      title: "React Performance Optimization",
-      description: "Tips and tricks to boost your React app's performance",
-      image: "/placeholder.svg?height=400&width=600",
-      type: "Video",
-      date: "June 10, 2023",
-      views: 4500
-    }
-  ]
-}
-
-// Empty data for a new video
-const newVideoData = {
-  id: null,
-  title: "",
-  subheading: "",
-  description: "",
-  author: {
-    name: "Mihir Parmar",
-    avatar: "/author.svg?height=400&width=400"
-  },
-  date: "",
-  duration: "",
-  likes: 0,
-  bookmarks: 0,
-  videoUrl: "",
-  relatedContent: []
-}
-
 function DynamicVideoEditorPage({ isNewVideo = false }) {
   const [darkMode, setDarkMode] = useState(true)
-  const [videoData, setVideoData] = useState(isNewVideo ? newVideoData : existingVideoData)
+  const [videoData, setVideoData] = useState({
+    id: null,
+    title: "",
+    subheading: "",
+    description: "",
+    author: {
+      name: "Mihir Parmar",
+      avatar: "/author.svg?height=400&width=400"
+    },
+    date: "",
+    duration: "",
+    likes: 0,
+    bookmarks: 0,
+    videoUrl: "",
+    relatedContent: []
+  })
   const [title, setTitle] = useState(videoData.title)
   const [subheading, setSubheading] = useState(videoData.subheading)
   const [description, setDescription] = useState(videoData.description)
