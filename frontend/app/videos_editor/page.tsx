@@ -1,15 +1,13 @@
-'use client'
-
+"use client"
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import Meditor from "@/components/Meditor"
-import { Calendar, Clock, Eye, Heart, Bookmark, Share2, Search, Edit, Save, Trash, Upload, Sun, Moon, Star, ArrowLeft, ArrowRight, Facebook, Twitter, Instagram, Linkedin, Github, Mail, Rss, Download, MessageSquare, PlayCircle } from 'lucide-react'
+import { Calendar, Clock, Search, Sun, Moon, Upload, Save, Trash, Mail, Rss, Download, Facebook, Twitter, Instagram, Linkedin, Github } from 'lucide-react'
 
 // Dummy data
 const dummyVideoData = {
@@ -66,7 +64,6 @@ export default function VideoEditorPage() {
   const [date, setDate] = useState(videoData.date)
   const [duration, setDuration] = useState(videoData.duration)
   const [videoFile, setVideoFile] = useState<File | null>(null)
-  const relatedContentRef = useRef<HTMLDivElement | null>(null)
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
 
@@ -77,7 +74,6 @@ export default function VideoEditorPage() {
   const toggleDarkMode = () => setDarkMode(!darkMode)
 
   const handleSaveChanges = () => {
-    // Update videoData state with new values
     setVideoData({
       ...videoData,
       title,
@@ -91,7 +87,6 @@ export default function VideoEditorPage() {
   }
 
   const handleDeleteVideo = () => {
-    // Logic to delete the video
     console.log("Video deleted")
     // Here you could also make an API call to delete the video from the backend
   }
@@ -185,7 +180,7 @@ export default function VideoEditorPage() {
                 {/* Video Description */}
                 <section className="mb-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
                   <h3 className="text-xl font-bold mb-2">Description</h3>
-                  <p className="text-gray-700 dark:text-gray-300">{videoData.description}</p>
+                  <div className="text-gray-700 dark:text-gray-300" dangerouslySetInnerHTML={{ __html: videoData.description }} />
                 </section>
               </div>
             ) : (
@@ -227,7 +222,7 @@ export default function VideoEditorPage() {
                     <div>
                       <label className="block text-sm font-medium mb-2">Video Description</label>
                       <Card className="min-h-[200px] p-4 bg-white dark:bg-gray-700">
-                        <Meditor value={description} onChange={setDescription} />
+                        <Meditor content={description} setContent={setDescription} />
                       </Card>
                     </div>
                     <div>
