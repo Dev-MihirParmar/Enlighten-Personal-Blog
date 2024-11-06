@@ -16,8 +16,8 @@ import { AdminLogin } from './admin-login'
 const contentItems = [
   { id: '1', title: 'The Future of Web Development', type: 'Article', date: '2023-10-18', status: 'Published', views: 1500, likes: 120, bookmarks: 45 },
   { id: '2', title: 'Building a React Native App', type: 'Video', date: '2023-09-10', status: 'Draft', views: 0, likes: 0, bookmarks: 0 },
-  { id: '3', title: 'Machine Learning Chatbot', type: 'Project', date: '2023-09-05', status: 'Published', views: 800, likes: 67, bookmarks: 23 },
-  { id: '4', title: 'Awesome JavaScript', type: 'Repository', date: '2023-09-01', status: 'Published', views: 5000, likes: 250, bookmarks: 180 },
+  { id: '3', title: 'Machine Learning Chatbot', type: 'Article', date: '2023-09-05', status: 'Published', views: 800, likes: 67, bookmarks: 23 },
+  { id: '4', title: 'Advanced CSS Techniques', type: 'Video', date: '2023-09-01', status: 'Published', views: 5000, likes: 250, bookmarks: 180 },
 ]
 
 export default function AdminDashboard() {
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
   }
 
   const handleLogin = (username: string, password: string) => {
-    if (username === 'admin' && password === 'mihir9373') {
+    if (username === 'admin' && password === 'password') {
       setIsAuthenticated(true)
       localStorage.setItem('adminAuthenticated', 'true')
     }
@@ -55,9 +55,9 @@ export default function AdminDashboard() {
 
   const navigateToEditor = (type: string, id?: string) => {
     if (id) {
-      router.push(`/admin/edit/${type.toLowerCase()}/${id}`)
+      router.push(`/${type.toLowerCase()}s/${id}/edit`)
     } else {
-      router.push(`/admin/create/${type.toLowerCase()}`)
+      router.push(`/${type.toLowerCase()}s/new`)
     }
   }
 
@@ -174,14 +174,6 @@ export default function AdminDashboard() {
                 <PlusCircle className="mr-2 h-5 w-5" />
                 New Video
               </Button>
-              <Button onClick={() => navigateToEditor('Project')} className="h-20 text-lg">
-                <PlusCircle className="mr-2 h-5 w-5" />
-                New Project
-              </Button>
-              <Button onClick={() => navigateToEditor('Repository')} className="h-20 text-lg">
-                <PlusCircle className="mr-2 h-5 w-5" />
-                New Repository
-              </Button>
             </CardContent>
           </Card>
 
@@ -236,20 +228,20 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="bg-white dark:bg-gray-800">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-gray-900 dark:text-gray-100">Quick Settings</CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-300">Adjust your site settings</CardDescription>
+              <CardTitle>Quick Settings</CardTitle>
+              <CardDescription>Adjust your site settings</CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="site-title" className="text-gray-700 dark:text-gray-300">Site Title</Label>
-                  <Input id="site-title" defaultValue="Enlighten" className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
+                  <Label htmlFor="site-title">Site Title</Label>
+                  <Input id="site-title" defaultValue="Enlighten" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="site-description" className="text-gray-700 dark:text-gray-300">Site Description</Label>
-                  <Textarea id="site-description" defaultValue="A blog about web development and technology." className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
+                  <Label htmlFor="site-description">Site Description</Label>
+                  <Textarea id="site-description" defaultValue="A blog about web development and technology." />
                 </div>
                 <Button type="submit">Save Changes</Button>
               </form>
