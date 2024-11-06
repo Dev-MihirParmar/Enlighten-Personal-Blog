@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import Meditor from "@/components/Meditor"
-import { Calendar, Clock, Search, Sun, Moon, Upload, Save, Trash } from 'lucide-react'
+import { Calendar, Clock, Search, Sun, Moon, Upload, Save } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -28,7 +28,7 @@ const newArticleData = {
   },
 }
 
-export default function ArticleEditorPage({ articleId = '' }: { articleId?: string | null }) {
+export default function CreateArticlePage() {
   const [darkMode, setDarkMode] = useState(true)
   const [articleData, setArticleData] = useState(newArticleData)
   const [title, setTitle] = useState('')
@@ -45,39 +45,11 @@ export default function ArticleEditorPage({ articleId = '' }: { articleId?: stri
     document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
 
-  useEffect(() => {
-    if (articleId) {
-      // Fetch existing article data
-      fetchArticle(articleId)
-    }
-  }, [articleId])
-
-  const fetchArticle = async (id: string) => {
-    setIsLoading(true)
-    try {
-      // Replace this with your actual API call
-      const response = await fetch(`/api/articles/${id}`)
-      const data = await response.json()
-      setArticleData(data)
-      setTitle(data.title)
-      setSubheading(data.subheading)
-      setContent(data.content)
-      setDate(data.date)
-      setReadTime(data.readTime)
-      setCategory(data.category)
-      setImage(data.image)
-    } catch (error) {
-      toast.error('Failed to fetch article')
-    }
-    setIsLoading(false)
-  }
-
   const toggleDarkMode = () => setDarkMode(!darkMode)
 
-
-  const handleSaveChanges = async () => {
+  const handleCreateArticle = async () => {
     setIsLoading(true)
-    const updatedArticle = {
+    const newArticle = {
       ...articleData,
       title,
       subheading,
@@ -89,55 +61,30 @@ export default function ArticleEditorPage({ articleId = '' }: { articleId?: stri
     }
 
     try {
-      // Replace this with your actual API call
-      const response = await fetch(`/api/articles${articleId ? `/${articleId}` : ''}`, {
-        method: articleId ? 'PUT' : 'POST',
+      const response = await fetch('/api/articles', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedArticle),
+        body: JSON.stringify(newArticle),
       })
 
       if (response.ok) {
-        setArticleData(updatedArticle)
-        toast.success(articleId ? 'Changes saved successfully!' : 'New article created successfully!')
+        toast.success('New article created successfully!')
+        // Reset form
+        setTitle('')
+        setSubheading('')
+        setContent('')
+        setDate('')
+        setReadTime('')
+        setCategory('')
+        setImage('')
       } else {
-        throw new Error('Failed to save article')
+        throw new Error('Failed to create article')
       }
     } catch (error) {
-      toast.error('Failed to save article')
+      toast.error('Failed to create article')
     }
 
     setIsLoading(false)
-  }
-
-  const handleDeleteArticle = async () => {
-    if (!articleId) {
-      // Reset form for new article
-      setTitle('')
-      setSubheading('')
-      setContent('')
-      setDate('')
-      setReadTime('')
-      setCategory('')
-      setImage('')
-      toast.info("Form reset")
-    } else {
-      // Delete existing article
-      try {
-        // Replace this with your actual API call
-        const response = await fetch(`/api/articles/${articleId}`, {
-          method: 'DELETE',
-        })
-
-        if (response.ok) {
-          toast.success("Article deleted")
-          // Redirect to articles list or home page
-        } else {
-          throw new Error('Failed to delete article')
-        }
-      } catch (error) {
-        toast.error('Failed to delete article')
-      }
-    }
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,7 +126,7 @@ export default function ArticleEditorPage({ articleId = '' }: { articleId?: stri
                   <Button variant="default" size="sm" onClick={() => setIsPreviewMode(!isPreviewMode)}>
                     {isPreviewMode ? 'Back to Edit' : 'Preview'}
                   </Button>
-                  <Button variant="default" size="sm" onClick={handleSaveChanges}>
+                  <Button variant="default" size="sm" onClick={handleCreateArticle}>
                     <Upload className="h-4 w-4 mr-2" />
                     Publish
                   </Button>
@@ -232,7 +179,7 @@ export default function ArticleEditorPage({ articleId = '' }: { articleId?: stri
               // Edit Mode
               <div>
                 <header className="mb-8">
-                  <h1 className="text-4xl font-bold mb-2">{articleId ? 'Edit Article' : 'Create New Article'}</h1>
+                  <h1 className="text-4xl font-bold mb-2">Create New Article</h1>
                 </header>
 
                 <section className="mb-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
@@ -297,13 +244,9 @@ export default function ArticleEditorPage({ articleId = '' }: { articleId?: stri
                   </div>
                 </section>
 
-                <section className="mb-8 flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                  <Button variant="default" size="sm" onClick={handleSaveChanges} className="ml-auto" disabled={isLoading}>
-                    {isLoading ? 'Saving...' : <><Save className="h-4 w-4 mr-2" /> {articleId ? 'Save Changes' : 'Create Article'}</>}
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleDeleteArticle}>
-                    <Trash className="h-4 w-4 mr-2" />
-                    {articleId ? 'Delete Article' : 'Reset Form'}
+                <section className="mb-8 flex justify-end items-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                  <Button variant="default" size="sm" onClick={handleCreateArticle} disabled={isLoading}>
+                    {isLoading ? 'Creating...' : <><Save className="h-4 w-4 mr-2" /> Create Article</>}
                   </Button>
                 </section>
               </div>
@@ -339,5 +282,3 @@ export default function ArticleEditorPage({ articleId = '' }: { articleId?: stri
     </div>
   )
 }
-
-

@@ -1,4 +1,5 @@
-"use client"
+'use client'
+
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -11,10 +12,10 @@ import { Calendar, Clock, Search, Sun, Moon, Upload, Save, Trash, Mail, Rss, Dow
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-function DynamicVideoEditorPage({ isNewVideo = false }) {
+export default function EditVideoPage({ videoId }: { videoId: string }) {
   const [darkMode, setDarkMode] = useState(true)
   const [videoData, setVideoData] = useState({
-    id: null,
+    id: "",
     title: "",
     subheading: "",
     description: "",
@@ -29,89 +30,85 @@ function DynamicVideoEditorPage({ isNewVideo = false }) {
     videoUrl: "",
     relatedContent: []
   })
-  const [title, setTitle] = useState(videoData.title)
-  const [subheading, setSubheading] = useState(videoData.subheading)
-  const [description, setDescription] = useState(videoData.description)
-  const [date, setDate] = useState(videoData.date)
-  const [duration, setDuration] = useState(videoData.duration)
-  const [, setVideoFile] = useState<File | null>(null)
-  const [videoPreview, setVideoPreview] = useState<string | null>(videoData.videoUrl)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
-    const autoSaveInterval = setInterval(() => {
-      handleAutoSave()
-    }, 5000)
-    return () => clearInterval(autoSaveInterval)
-  }, [darkMode, title, subheading, description, date, duration, videoPreview])
+  }, [darkMode])
+
+  useEffect(() => {
+    if (videoId) {
+      fetchVideo(videoId)
+    }
+  }, [videoId])
+
+  const fetchVideo = async (id: string) => {
+    setIsLoading(true)
+    try {
+      // Replace this with your actual API call
+      const response = await fetch(`/api/videos/${id}`)
+      const data = await response.json()
+      setVideoData(data)
+    } catch (error) {
+      toast.error('Failed to fetch video')
+    }
+    setIsLoading(false)
+  }
 
   const toggleDarkMode = () => setDarkMode(!darkMode)
 
-  const handleAutoSave = () => {
-    setVideoData({
-      ...videoData,
-      title,
-      subheading,
-      description,
-      date,
-      duration,
-      videoUrl: videoPreview || videoData.videoUrl
-    })
-    toast.info('Auto-saving changes...', { autoClose: 1000 })
-  }
-
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     setIsLoading(true)
-    setTimeout(() => {
-      setVideoData({
-        ...videoData,
-        title,
-        subheading,
-        description,
-        date,
-        duration,
-        videoUrl: videoPreview || videoData.videoUrl
+    try {
+      // Replace this with your actual API call
+      const response = await fetch(`/api/videos/${videoId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(videoData),
       })
-      setIsLoading(false)
-      toast.success(isNewVideo ? 'New video created successfully!' : 'Changes saved successfully!')
-    }, 2000)
-    // Here you would make an API call to save the changes to the backend
+
+      if (response.ok) {
+        toast.success('Changes saved successfully!')
+      } else {
+        throw new Error('Failed to save video')
+      }
+    } catch (error) {
+      toast.error('Failed to save video')
+    }
+    setIsLoading(false)
   }
 
-  const handleDeleteVideo = () => {
-    if (isNewVideo) {
-      // Reset form for new video
-      setTitle("")
-      setSubheading("")
-      setDescription("")
-      setDate("")
-      setDuration("")
-      setVideoPreview(null)
-      setVideoFile(null)
-      toast.info("Form reset")
-    } else {
-      // Delete existing video
-      toast.error("Video deleted")
-      // Here you would make an API call to delete the video from the backend
+  const handleDeleteVideo = async () => {
+    if (confirm('Are you sure you want to delete this video?')) {
+      try {
+        // Replace this with your actual API call
+        const response = await fetch(`/api/videos/${videoId}`, {
+          method: 'DELETE',
+        })
+
+        if (response.ok) {
+          toast.success("Video deleted")
+          // Redirect to videos list or home page
+        } else {
+          throw new Error('Failed to delete video')
+        }
+      } catch (error) {
+        toast.error('Failed to delete video')
+      }
     }
   }
 
   const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setVideoFile(file)
-      const previewUrl = URL.createObjectURL(file)
-      setVideoPreview(previewUrl)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setVideoData(prev => ({ ...prev, videoUrl: reader.result as string }))
+      }
+      reader.readAsDataURL(file)
       toast.info('Video uploaded successfully!')
     }
-  }
-
-  const handleRemoveVideo = () => {
-    setVideoFile(null)
-    setVideoPreview(null)
-    toast.info('Video removed successfully!')
   }
 
   return (
@@ -141,9 +138,9 @@ function DynamicVideoEditorPage({ isNewVideo = false }) {
                   <Button variant="default" size="sm" onClick={() => setIsPreviewMode(!isPreviewMode)}>
                     {isPreviewMode ? 'Back to Edit' : 'Preview'}
                   </Button>
-                  <Button variant="default" size="sm" onClick={() => console.log('Publish clicked')}>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Publish
+                  <Button variant="default" size="sm" onClick={handleSaveChanges}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Changes
                   </Button>
                 </div>
               </div>
@@ -182,10 +179,10 @@ function DynamicVideoEditorPage({ isNewVideo = false }) {
                 {/* Video Player */}
                 <main className="mb-12">
                   <div className="relative w-full h-0" style={{ paddingBottom: '56.25%' }}>
-                    {videoPreview ? (
+                    {videoData.videoUrl ? (
                       <video
                         className="absolute top-0 left-0 w-full h-full rounded-lg object-cover"
-                        src={videoPreview}
+                        src={videoData.videoUrl}
                         controls
                         width="100%"
                         height="100%"
@@ -209,7 +206,7 @@ function DynamicVideoEditorPage({ isNewVideo = false }) {
               <div>
                 {/* Content Editor Header */}
                 <header className="mb-8">
-                  <h1 className="text-4xl font-bold mb-2">{isNewVideo ? 'Create New Video' : 'Edit Video'}</h1>
+                  <h1 className="text-4xl font-bold mb-2">Edit Video</h1>
                 </header>
 
                 {/* Video Details Editor */}
@@ -217,53 +214,46 @@ function DynamicVideoEditorPage({ isNewVideo = false }) {
                   <h3 className="text-xl font-bold mb-4">Video Details</h3>
                   <div className="space-y-4">
                     <Input
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
+                      value={videoData.title}
+                      onChange={(e) => setVideoData(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="Video Title"
                       className="w-full p-2 border rounded-md"
                     />
                     <Input
-                      value={subheading}
-                      onChange={(e) => setSubheading(e.target.value)}
+                      value={videoData.subheading}
+                      onChange={(e) => setVideoData(prev => ({ ...prev, subheading: e.target.value }))}
                       placeholder="Video Subheading"
                       className="w-full p-2 border rounded-md"
                     />
                     <Input
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
+                      value={videoData.date}
+                      onChange={(e) => setVideoData(prev => ({ ...prev, date: e.target.value }))}
                       placeholder="Date (e.g., May 15, 2023)"
                       className="w-full p-2 border rounded-md"
                     />
                     <Input
-                      value={duration}
-                      onChange={(e) => setDuration(e.target.value)}
+                      value={videoData.duration}
+                      onChange={(e) => setVideoData(prev => ({ ...prev, duration: e.target.value }))}
                       placeholder="Duration (e.g., 15:30)"
                       className="w-full p-2 border rounded-md"
                     />
                     <div>
                       <label className="block text-sm font-medium mb-2">Video Description</label>
                       <Card className="min-h-[200px] p-4 bg-white dark:bg-gray-700">
-                        <Meditor content={description} setContent={setDescription} />
+                        <Meditor content={videoData.description} setContent={(content) => setVideoData(prev => ({ ...prev, description: content }))} />
                       </Card>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Upload Video</label>
+                      <label className="block text-sm font-medium mb-2">Replace Video</label>
                       <Input
                         type="file"
                         accept="video/*"
                         onChange={handleVideoUpload}
                         className="w-full p-2 border rounded-md"
                       />
-                      {videoPreview ? (
+                      {videoData.videoUrl && (
                         <div className="mt-4">
-                          <video controls src={videoPreview} className="w-full rounded-md" />
-                          <Button variant="outline" size="sm" onClick={handleRemoveVideo} className="mt-4">
-                            Remove Video
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="mt-4 p-8 border-2 border-dashed rounded-md flex items-center justify-center">
-                          <p className="text-gray-500 dark:text-gray-400">No video uploaded</p>
+                          <video controls src={videoData.videoUrl} className="w-full rounded-md" />
                         </div>
                       )}
                     </div>
@@ -272,12 +262,12 @@ function DynamicVideoEditorPage({ isNewVideo = false }) {
 
                 {/* Action Buttons */}
                 <section className="mb-8 flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                  <Button variant="default" size="sm" onClick={handleSaveChanges} className="ml-auto" disabled={isLoading}>
-                    {isLoading ? 'Saving...' : <><Save className="h-4 w-4 mr-2" /> {isNewVideo ? 'Create Video' : 'Save Changes'}</>}
+                  <Button variant="default" size="sm" onClick={handleSaveChanges} disabled={isLoading}>
+                    {isLoading ? 'Saving...' : <><Save className="h-4 w-4 mr-2" /> Save Changes</>}
                   </Button>
                   <Button variant="outline" size="sm" onClick={handleDeleteVideo}>
                     <Trash className="h-4 w-4 mr-2" />
-                    {isNewVideo ? 'Reset Form' : 'Delete Video'}
+                    Delete Video
                   </Button>
                 </section>
               </div>
@@ -372,15 +362,7 @@ function DynamicVideoEditorPage({ isNewVideo = false }) {
           </div>
         </footer>
       </div>
-    </div>
-  )
-}
-
-export default function App() {
-  return (
-    <>
-      <DynamicVideoEditorPage />
       <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
-    </>
+    </div>
   )
 }
