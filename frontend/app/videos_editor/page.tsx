@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -8,15 +8,15 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import Meditor from "@/components/Meditor"
 import { Calendar, Clock, Search, Sun, Moon, Upload, Save, Trash, Mail, Rss, Download, Facebook, Twitter, Instagram, Linkedin, Github } from 'lucide-react'
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-// Dummy data
-const dummyVideoData = {
+// Dummy data for an existing video
+const existingVideoData = {
   id: 1,
   title: "Understanding React Hooks",
   subheading: "A deep dive into the world of functional components",
-  description: "This video provides a comprehensive overview of React Hooks, explaining their purpose, usage, and best practices.  We'll cover useState, useEffect, useContext, and more!",
+  description: "This video provides a comprehensive overview of React Hooks, explaining their purpose, usage, and best practices. We'll cover useState, useEffect, useContext, and more!",
   author: {
     name: "Mihir Parmar",
     avatar: "/author.svg?height=400&width=400"
@@ -57,16 +57,34 @@ const dummyVideoData = {
   ]
 }
 
-function VideoEditorPage() {
+// Empty data for a new video
+const newVideoData = {
+  id: null,
+  title: "",
+  subheading: "",
+  description: "",
+  author: {
+    name: "Mihir Parmar",
+    avatar: "/author.svg?height=400&width=400"
+  },
+  date: "",
+  duration: "",
+  likes: 0,
+  bookmarks: 0,
+  videoUrl: "",
+  relatedContent: []
+}
+
+function DynamicVideoEditorPage({ isNewVideo = false }) {
   const [darkMode, setDarkMode] = useState(true)
-  const [videoData, setVideoData] = useState(dummyVideoData)
+  const [videoData, setVideoData] = useState(isNewVideo ? newVideoData : existingVideoData)
   const [title, setTitle] = useState(videoData.title)
   const [subheading, setSubheading] = useState(videoData.subheading)
   const [description, setDescription] = useState(videoData.description)
   const [date, setDate] = useState(videoData.date)
   const [duration, setDuration] = useState(videoData.duration)
   const [videoFile, setVideoFile] = useState<File | null>(null)
-  const [videoPreview, setVideoPreview] = useState<string | null>(null)
+  const [videoPreview, setVideoPreview] = useState<string | null>(videoData.videoUrl)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -90,7 +108,7 @@ function VideoEditorPage() {
       duration,
       videoUrl: videoPreview || videoData.videoUrl
     })
-    toast.info('Auto-saving changes...', { autoClose: 1000 });
+    toast.info('Auto-saving changes...', { autoClose: 1000 })
   }
 
   const handleSaveChanges = () => {
@@ -106,21 +124,35 @@ function VideoEditorPage() {
         videoUrl: videoPreview || videoData.videoUrl
       })
       setIsLoading(false)
-      toast.success('Changes saved successfully!')
+      toast.success(isNewVideo ? 'New video created successfully!' : 'Changes saved successfully!')
     }, 2000)
-    // Here you could also make an API call to save the changes to the backend
+    // Here you would make an API call to save the changes to the backend
   }
 
   const handleDeleteVideo = () => {
-    toast.error("Video deleted")
-    // Here you could also make an API call to delete the video from the backend
+    if (isNewVideo) {
+      // Reset form for new video
+      setTitle("")
+      setSubheading("")
+      setDescription("")
+      setDate("")
+      setDuration("")
+      setVideoPreview(null)
+      setVideoFile(null)
+      toast.info("Form reset")
+    } else {
+      // Delete existing video
+      toast.error("Video deleted")
+      // Here you would make an API call to delete the video from the backend
+    }
   }
 
   const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       setVideoFile(file)
-      setVideoPreview(URL.createObjectURL(file))
+      const previewUrl = URL.createObjectURL(file)
+      setVideoPreview(previewUrl)
       toast.info('Video uploaded successfully!')
     }
   }
@@ -199,19 +231,20 @@ function VideoEditorPage() {
                 {/* Video Player */}
                 <main className="mb-12">
                   <div className="relative w-full h-0" style={{ paddingBottom: '56.25%' }}>
-                    <video
-                      className="absolute top-0 left-0 w-full h-full rounded-lg"
-                      src={videoPreview || videoData.videoUrl}
-                      controls
-                      width="100%"
-                      height="100%"
-                    />
+                    {videoPreview ? (
+                      <video
+                        className="absolute top-0 left-0 w-full h-full rounded-lg object-cover"
+                        src={videoPreview}
+                        controls
+                        width="100%"
+                        height="100%"
+                      />
+                    ) : (
+                      <div className="absolute top-0 left-0 w-full h-full rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <p className="text-gray-500 dark:text-gray-400">No video uploaded</p>
+                      </div>
+                    )}
                   </div>
-                  {videoPreview && (
-                    <Button variant="outline" size="sm" onClick={handleRemoveVideo} className="mt-4">
-                      Remove Video
-                    </Button>
-                  )}
                 </main>
 
                 {/* Video Description */}
@@ -225,7 +258,7 @@ function VideoEditorPage() {
               <div>
                 {/* Content Editor Header */}
                 <header className="mb-8">
-                  <h1 className="text-4xl font-bold mb-2">Edit Video</h1>
+                  <h1 className="text-4xl font-bold mb-2">{isNewVideo ? 'Create New Video' : 'Edit Video'}</h1>
                 </header>
 
                 {/* Video Details Editor */}
@@ -270,12 +303,16 @@ function VideoEditorPage() {
                         onChange={handleVideoUpload}
                         className="w-full p-2 border rounded-md"
                       />
-                      {videoPreview && (
+                      {videoPreview ? (
                         <div className="mt-4">
                           <video controls src={videoPreview} className="w-full rounded-md" />
                           <Button variant="outline" size="sm" onClick={handleRemoveVideo} className="mt-4">
                             Remove Video
                           </Button>
+                        </div>
+                      ) : (
+                        <div className="mt-4 p-8 border-2 border-dashed rounded-md flex items-center justify-center">
+                          <p className="text-gray-500 dark:text-gray-400">No video uploaded</p>
                         </div>
                       )}
                     </div>
@@ -285,11 +322,11 @@ function VideoEditorPage() {
                 {/* Action Buttons */}
                 <section className="mb-8 flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
                   <Button variant="default" size="sm" onClick={handleSaveChanges} className="ml-auto" disabled={isLoading}>
-                    {isLoading ? 'Saving...' : <><Save className="h-4 w-4 mr-2" /> Save Changes</>}
+                    {isLoading ? 'Saving...' : <><Save className="h-4 w-4 mr-2" /> {isNewVideo ? 'Create Video' : 'Save Changes'}</>}
                   </Button>
                   <Button variant="outline" size="sm" onClick={handleDeleteVideo}>
                     <Trash className="h-4 w-4 mr-2" />
-                    Delete Video
+                    {isNewVideo ? 'Reset Form' : 'Delete Video'}
                   </Button>
                 </section>
               </div>
@@ -388,13 +425,11 @@ function VideoEditorPage() {
   )
 }
 
-import { ToastContainer } from 'react-toastify';
-
 export default function App() {
   return (
     <>
-      <VideoEditorPage />
+      <DynamicVideoEditorPage />
       <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
     </>
-  );
+  )
 }
