@@ -53,7 +53,7 @@ export default function ArticleEditorPage({ articleId = null }) {
     }
   }, [articleId])
 
-  const fetchArticle = async (id) => {
+  const fetchArticle = async (id: string) => {
     setIsLoading(true)
     try {
       // Replace this with your actual API call
