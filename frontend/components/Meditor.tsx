@@ -34,8 +34,8 @@ const Meditor: React.FC<MeditorProps> = ({ content, setContent }) => {
   const [showFloatingMenu, setShowFloatingMenu] = useState(false);
   const [showPlusButton, setShowPlusButton] = useState(false);
   
-    const [jsonContent, setJSONContent] = useState<JSONContent | null>(null);
-  const [htmlContent, setHTMLContent] = useState<HTMLContent | null>(null);
+    const [] = useState<JSONContent | null>(null);
+  const [] = useState<HTMLContent | null>(null);
   
   const editor = useEditor({
     content,

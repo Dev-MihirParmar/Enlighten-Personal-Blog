@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Calendar, Clock, Eye, Heart, Bookmark, Share2, Search, Edit, Sun, Moon, Star, ArrowLeft, ArrowRight, Facebook, Twitter, Instagram, Linkedin, Github, Mail, Rss, Download, MessageSquare, PlayCircle } from 'lucide-react'
+import { Calendar, Clock, Eye, Heart, Bookmark, Share2, Search, Edit, Sun, Moon, ArrowLeft, ArrowRight, Facebook, Twitter, Instagram, Linkedin, Github, Mail, Rss, Download, MessageSquare, PlayCircle } from 'lucide-react'
 
 // Dummy data
 const dummyVideoData = {
@@ -63,7 +63,7 @@ export default function VideoContentPage() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [comments, setComments] = useState<string[]>([])
   const [newComment, setNewComment] = useState("")
-  const [videoData, setVideoData] = useState(dummyVideoData)
+  const [videoData] = useState(dummyVideoData)
   const relatedContentRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {

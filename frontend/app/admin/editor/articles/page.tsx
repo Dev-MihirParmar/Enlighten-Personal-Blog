@@ -7,9 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import Meditor from "@/components/Meditor"
-import { Calendar, Clock, Search, Sun, Moon, Upload, Save, Trash, ArrowLeft } from 'lucide-react'
+import { Calendar, Clock, Search, Sun, Moon, Upload, Save, Trash } from 'lucide-react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -29,7 +28,7 @@ const newArticleData = {
   },
 }
 
-export default function ArticleEditorPage({ articleId = null }) {
+export default function ArticleEditorPage({ articleId = '' }: { articleId?: string | null }) {
   const [darkMode, setDarkMode] = useState(true)
   const [articleData, setArticleData] = useState(newArticleData)
   const [title, setTitle] = useState('')
@@ -75,10 +74,6 @@ export default function ArticleEditorPage({ articleId = null }) {
 
   const toggleDarkMode = () => setDarkMode(!darkMode)
 
-  const handleAutoSave = () => {
-    // Implement auto-save logic here
-    toast.info('Auto-saving changes...', { autoClose: 1000 })
-  }
 
   const handleSaveChanges = async () => {
     setIsLoading(true)
@@ -344,3 +339,5 @@ export default function ArticleEditorPage({ articleId = null }) {
     </div>
   )
 }
+
+

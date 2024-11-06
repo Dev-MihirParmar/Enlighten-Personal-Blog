@@ -24,7 +24,7 @@ interface CodeBlockSelectProps {
   };
 }
 
-const CodeBlockSelect =  ({ node: { attrs: { language: defaultLanguage } }, updateAttributes, extension }: CodeBlockSelectProps) => (
+const CodeBlockSelect =  ({ node: { }, updateAttributes, extension }: CodeBlockSelectProps) => (
   <NodeViewWrapper className="code-block">
     <pre className="relative m-0 !mt-[44px] box-border rounded-[4px] border border-[#E5E5E5] bg-[#F9F9F9] !p-[32px] text-[14px] text-black text-opacity-[.84]">
       <div className="absolute left-[12px] top-[8px] z-[999]">

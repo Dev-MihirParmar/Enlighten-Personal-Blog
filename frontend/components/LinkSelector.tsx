@@ -21,7 +21,7 @@ export const LinkSelector: FC<LinkSelectorProps> = ({ editor, showLinkSelector, 
     e.preventDefault();
     
     const input = e.currentTarget[0] as HTMLInputElement;
-    var url;
+    let url;
     try {
       url = getUrlFromString(input.value);
     } catch (error) {
@@ -80,3 +80,5 @@ export const LinkSelector: FC<LinkSelectorProps> = ({ editor, showLinkSelector, 
     </div>
   );
 };
+
+

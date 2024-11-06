@@ -9,8 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { PlusCircle, Pencil, Trash2, Users, Settings, BarChart, Sun, Moon, Eye, Heart, Bookmark, Calendar, Clock, LogOut } from 'lucide-react'
+import { PlusCircle, Pencil, Trash2, Users, Sun, Moon, Eye, Heart, Bookmark, LogOut } from 'lucide-react'
 import { AdminLogin } from './admin-login'
 
 // Mock data for content items
@@ -105,7 +104,7 @@ export default function AdminDashboard() {
       <main className="max-w-8xl mx-auto py-12 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Welcome back, Admin</h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400">Here's what's happening with your site today.</p>
+          <p className="text-xl text-gray-600 dark:text-gray-400">Heres whats happening with your site today.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -251,7 +250,7 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Analytics Overview</CardTitle>
-              <CardDescription>Your site's performance this week</CardDescription>
+              <CardDescription>Your sites performance this week</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[200px] flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-md">
