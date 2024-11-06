@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import Meditor from "@/components/Meditor"
 import { Calendar, Clock, Search, Sun, Moon, Upload, Save, Trash, Mail, Rss, Download, Facebook, Twitter, Instagram, Linkedin, Github } from 'lucide-react'
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Dummy data
 const dummyVideoData = {
@@ -55,7 +57,7 @@ const dummyVideoData = {
   ]
 }
 
-export default function VideoEditorPage() {
+function VideoEditorPage() {
   const [darkMode, setDarkMode] = useState(true)
   const [videoData, setVideoData] = useState(dummyVideoData)
   const [title, setTitle] = useState(videoData.title)
@@ -66,14 +68,19 @@ export default function VideoEditorPage() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
-  }, [darkMode])
+    const autoSaveInterval = setInterval(() => {
+      handleAutoSave()
+    }, 5000)
+    return () => clearInterval(autoSaveInterval)
+  }, [darkMode, title, subheading, description, date, duration, videoPreview])
 
   const toggleDarkMode = () => setDarkMode(!darkMode)
 
-  const handleSaveChanges = () => {
+  const handleAutoSave = () => {
     setVideoData({
       ...videoData,
       title,
@@ -83,11 +90,29 @@ export default function VideoEditorPage() {
       duration,
       videoUrl: videoPreview || videoData.videoUrl
     })
+    toast.info('Auto-saving changes...', { autoClose: 1000 });
+  }
+
+  const handleSaveChanges = () => {
+    setIsLoading(true)
+    setTimeout(() => {
+      setVideoData({
+        ...videoData,
+        title,
+        subheading,
+        description,
+        date,
+        duration,
+        videoUrl: videoPreview || videoData.videoUrl
+      })
+      setIsLoading(false)
+      toast.success('Changes saved successfully!')
+    }, 2000)
     // Here you could also make an API call to save the changes to the backend
   }
 
   const handleDeleteVideo = () => {
-    console.log("Video deleted")
+    toast.error("Video deleted")
     // Here you could also make an API call to delete the video from the backend
   }
 
@@ -96,7 +121,14 @@ export default function VideoEditorPage() {
     if (file) {
       setVideoFile(file)
       setVideoPreview(URL.createObjectURL(file))
+      toast.info('Video uploaded successfully!')
     }
+  }
+
+  const handleRemoveVideo = () => {
+    setVideoFile(null)
+    setVideoPreview(null)
+    toast.info('Video removed successfully!')
   }
 
   return (
@@ -123,10 +155,10 @@ export default function VideoEditorPage() {
                   <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
                     {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                   </Button>
-                  <Button variant="solid" size="sm" onClick={() => setIsPreviewMode(!isPreviewMode)}>
+                  <Button variant="default" size="sm" onClick={() => setIsPreviewMode(!isPreviewMode)}>
                     {isPreviewMode ? 'Back to Edit' : 'Preview'}
                   </Button>
-                  <Button variant="solid" size="sm" onClick={() => console.log('Publish clicked')}>
+                  <Button variant="default" size="sm" onClick={() => console.log('Publish clicked')}>
                     <Upload className="h-4 w-4 mr-2" />
                     Publish
                   </Button>
@@ -175,6 +207,11 @@ export default function VideoEditorPage() {
                       height="100%"
                     />
                   </div>
+                  {videoPreview && (
+                    <Button variant="outline" size="sm" onClick={handleRemoveVideo} className="mt-4">
+                      Remove Video
+                    </Button>
+                  )}
                 </main>
 
                 {/* Video Description */}
@@ -236,6 +273,9 @@ export default function VideoEditorPage() {
                       {videoPreview && (
                         <div className="mt-4">
                           <video controls src={videoPreview} className="w-full rounded-md" />
+                          <Button variant="outline" size="sm" onClick={handleRemoveVideo} className="mt-4">
+                            Remove Video
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -244,9 +284,8 @@ export default function VideoEditorPage() {
 
                 {/* Action Buttons */}
                 <section className="mb-8 flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                  <Button variant="solid" size="sm" onClick={handleSaveChanges} className="ml-auto">
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Changes
+                  <Button variant="default" size="sm" onClick={handleSaveChanges} className="ml-auto" disabled={isLoading}>
+                    {isLoading ? 'Saving...' : <><Save className="h-4 w-4 mr-2" /> Save Changes</>}
                   </Button>
                   <Button variant="outline" size="sm" onClick={handleDeleteVideo}>
                     <Trash className="h-4 w-4 mr-2" />
@@ -347,4 +386,15 @@ export default function VideoEditorPage() {
       </div>
     </div>
   )
+}
+
+import { ToastContainer } from 'react-toastify';
+
+export default function App() {
+  return (
+    <>
+      <VideoEditorPage />
+      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
+    </>
+  );
 }
