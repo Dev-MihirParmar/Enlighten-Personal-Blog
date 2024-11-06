@@ -94,15 +94,28 @@ export default function EditArticlePage({ articleId }: { articleId: string }) {
     }
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setArticleData(prev => ({ ...prev, image: reader.result as string }))
+      const formData = new FormData()
+      formData.append('file', file)
+
+      try {
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+
+        if (response.ok) {
+          const { filePath } = await response.json()
+          setArticleData(prev => ({ ...prev, image: filePath }))
+          toast.info('Image uploaded successfully!')
+        } else {
+          throw new Error('Image upload failed')
+        }
+      } catch (error) {
+        toast.error('Image upload failed')
       }
-      reader.readAsDataURL(file)
-      toast.info('Image uploaded successfully!')
     }
   }
 
@@ -133,9 +146,8 @@ export default function EditArticlePage({ articleId }: { articleId: string }) {
                   <Button variant="default" size="sm" onClick={() => setIsPreviewMode(!isPreviewMode)}>
                     {isPreviewMode ? 'Back to Edit' : 'Preview'}
                   </Button>
-                  <Button variant="default" size="sm" onClick={handleSaveChanges}>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Publish
+                  <Button variant="default" size="sm" onClick={handleSaveChanges} disabled={isLoading}>
+                    {isLoading ? 'Saving...' : <><Upload className="h-4 w-4 mr-2" /> Publish</>}
                   </Button>
                 </div>
               </div>
